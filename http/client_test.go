@@ -37,7 +37,7 @@ func TestRequestConfig_url(t *testing.T) {
 	assert.Equal(t, "https://example.com/some/path?name=test", cfg.url("https://example.com"))
 }
 
-func TestNew(t *testing.T) {
+func TestNewClient(t *testing.T) {
 	os.Setenv(ApiKeyEnvKey, "")
 	defer os.Setenv(ApiKeyEnvKey, "")
 

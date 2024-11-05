@@ -58,7 +58,7 @@ func (r RequestConfig) body() (io.Reader, error) {
 	return nil, nil
 }
 
-// ClientResponse is a data structured returned by the Client.Call() method.
+// ClientResponse is a data structured returned by `doRequest()`.
 // To make the client compatible even when the server changed their response format.
 // User of this library is responsible to handle the Body which is a slice of byte.
 type ClientResponse struct {
@@ -89,7 +89,7 @@ func (c *Client) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResp
 	return c.doRequest(req)
 }
 
-// JsonRequest make a call json-encoded payload
+// JsonRequest make a call with json-encoded payload
 func (c *Client) JsonRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
 	req, err := c.buildRequest(ctx, cfg)
 	if err != nil {
