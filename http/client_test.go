@@ -3,39 +3,12 @@ package http
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestRequestConfig_url(t *testing.T) {
-	q := url.Values{}
-	q.Add("name", "test")
-
-	// with slash prefix
-	cfg := RequestConfig{
-		Path:  "/some/path",
-		Query: q,
-	}
-	assert.Equal(t, "https://example.com/some/path?name=test", cfg.url("https://example.com"))
-
-	// with many slash prefix
-	cfg = RequestConfig{
-		Path:  "////some/path",
-		Query: q,
-	}
-	assert.Equal(t, "https://example.com/some/path?name=test", cfg.url("https://example.com"))
-
-	// no slash prefix
-	cfg = RequestConfig{
-		Path:  "some/path",
-		Query: q,
-	}
-	assert.Equal(t, "https://example.com/some/path?name=test", cfg.url("https://example.com"))
-}
 
 func TestNewClient(t *testing.T) {
 	os.Setenv(ApiKeyEnvKey, "")
@@ -57,16 +30,11 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestFormRequest_NoContext(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	c, s := MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
-	}))
-	defer server.Close()
+	})
+	defer s.Close()
 
-	c := &Client{
-		ApiKey:     "secret",
-		BaseUrl:    server.URL,
-		HTTPClient: server.Client(),
-	}
 	cfg := RequestConfig{
 		Method: "GET",
 		Path:   "/test",
@@ -76,16 +44,11 @@ func TestFormRequest_NoContext(t *testing.T) {
 }
 
 func TestFormRequest_MethodInvalid(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	c, s := MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
-	}))
-	defer server.Close()
+	})
+	defer s.Close()
 
-	c := &Client{
-		ApiKey:     "secret",
-		BaseUrl:    server.URL,
-		HTTPClient: server.Client(),
-	}
 	cfg := RequestConfig{
 		Method: "**BAD METHOD**",
 		Path:   "/test",
@@ -95,19 +58,14 @@ func TestFormRequest_MethodInvalid(t *testing.T) {
 }
 
 func TestFormRequest_GET(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	c, s := MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method)
 		assert.Equal(t, "/test", r.RequestURI)
 		assert.Equal(t, "secret", r.Header.Get("apikey"))
 		w.Write([]byte("OK"))
-	}))
-	defer server.Close()
+	})
+	defer s.Close()
 
-	c := &Client{
-		ApiKey:     "secret",
-		BaseUrl:    server.URL,
-		HTTPClient: server.Client(),
-	}
 	cfg := RequestConfig{
 		Method: "GET",
 		Path:   "/test",
@@ -117,19 +75,14 @@ func TestFormRequest_GET(t *testing.T) {
 }
 
 func TestFormRequest_GET_QueryParams(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	c, s := MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method)
 		assert.Equal(t, "/test?name=test", r.RequestURI)
 		assert.Equal(t, "secret", r.Header.Get("apikey"))
 		w.Write([]byte("OK"))
-	}))
-	defer server.Close()
+	})
+	defer s.Close()
 
-	c := &Client{
-		ApiKey:     "secret",
-		BaseUrl:    server.URL,
-		HTTPClient: server.Client(),
-	}
 	q := url.Values{}
 	q.Add("name", "test")
 
@@ -143,7 +96,7 @@ func TestFormRequest_GET_QueryParams(t *testing.T) {
 }
 
 func TestFormRequest(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	c, s := MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, "/test", r.RequestURI)
 		assert.Equal(t, "secret", r.Header.Get("apikey"))
@@ -156,14 +109,9 @@ func TestFormRequest(t *testing.T) {
 		assert.Equal(t, "20", r.Form.Get("age"))
 
 		w.Write([]byte("OK"))
-	}))
-	defer server.Close()
+	})
+	defer s.Close()
 
-	c := &Client{
-		ApiKey:     "secret",
-		BaseUrl:    server.URL,
-		HTTPClient: server.Client(),
-	}
 	d := url.Values{}
 	d.Add("name", "test")
 	d.Add("age", "20")

@@ -2,12 +2,10 @@ package http
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
+	"net/http/httptest"
 	"os"
 	"strings"
 )
@@ -20,43 +18,8 @@ const (
 	BaseUrl string = "https://api.idcloudhost.com"
 )
 
-type RequestConfig struct {
-	Method string
-	Path   string
-	Query  url.Values
-	Data   url.Values
-	Json   map[string]interface{}
-}
-
-// URL returns full request URL composed from baseURL, Path and Query field.
-func (r RequestConfig) url(baseURL string) string {
-	url := fmt.Sprintf("%s/%s", baseURL, strings.TrimLeft(r.Path, "/"))
-	if r.Query == nil {
-		return url
-	}
-	qs := r.Query.Encode()
-	return fmt.Sprintf("%s?%s", url, qs)
-}
-
-// body returns io.Reader either from Data or Json field
-func (r RequestConfig) body() (io.Reader, error) {
-	if r.Data != nil && r.Json != nil {
-		return nil, errors.New("data and json can not be set at the same time")
-	}
-	if r.Data != nil {
-		return strings.NewReader(r.Data.Encode()), nil
-	}
-	if r.Json != nil {
-		jsonStr, err := json.Marshal(r.Json)
-		if err != nil {
-			return nil, err
-		}
-		return strings.NewReader(string(jsonStr)), nil
-	}
-
-	// for request that don't have body
-	return nil, nil
-}
+// DefaultClient create Client with default configuration
+var DefaultClient *Client = NewClient()
 
 // ClientResponse is a data structured returned by `doRequest()`.
 // To make the client compatible even when the server changed their response format.
@@ -105,7 +68,7 @@ func (c *Client) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Req
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, cfg.Method, cfg.url(c.BaseUrl), body)
+	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(cfg.Method), cfg.url(c.BaseUrl), body)
 	if err != nil {
 		return nil, err
 	}
@@ -147,5 +110,13 @@ func NewClient() *Client {
 	}
 }
 
-// DefaultClient create Client with default configuration
-var DefaultClient *Client = NewClient()
+// MockClientServer returns client and test server to simplify API call testing
+func MockClientServer(fn func(w http.ResponseWriter, r *http.Request)) (*Client, *httptest.Server) {
+	s := httptest.NewServer(http.HandlerFunc(fn))
+	c := &Client{
+		ApiKey:     "secret",
+		BaseUrl:    s.URL,
+		HTTPClient: s.Client(),
+	}
+	return c, s
+}

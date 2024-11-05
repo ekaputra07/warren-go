@@ -56,13 +56,13 @@ func (c *ObjectStorageClient) GenerateS3UserKey(ctx context.Context) *http.Clien
 
 // DeleteS3UserKey https://api.idcloudhost.com/#generate-key
 func (c *ObjectStorageClient) DeleteS3UserKey(ctx context.Context, accessKey string) *http.ClientResponse {
-	d := url.Values{}
-	d.Add("access_key", accessKey)
+	q := url.Values{}
+	q.Add("access_key", accessKey)
 
 	cfg := http.RequestConfig{
 		Method: "DELETE",
 		Path:   "/v1/storage/user/keys",
-		Data:   d,
+		Query:  q,
 	}
 	return c.H.FormRequest(ctx, cfg)
 }
@@ -118,13 +118,13 @@ func (c *ObjectStorageClient) CreateBucket(ctx context.Context, bucketName strin
 
 // DeleteBucket https://api.idcloudhost.com/#delete-bucket
 func (c *ObjectStorageClient) DeleteBucket(ctx context.Context, bucketName string) *http.ClientResponse {
-	d := url.Values{}
-	d.Add("name", bucketName)
+	q := url.Values{}
+	q.Add("name", bucketName)
 
 	cfg := http.RequestConfig{
 		Method: "DELETE",
 		Path:   "/v1/storage/bucket",
-		Data:   d,
+		Query:  q,
 	}
 	return c.H.FormRequest(ctx, cfg)
 }
