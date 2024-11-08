@@ -10,8 +10,8 @@ import (
 )
 
 func ForBillingAccount(t *testing.T) {
-	c := NewClient().ForBillingAccount("test")
-	assert.Equal(t, "test", c.BillingAccountID)
+	c := NewClient().ForBillingAccount(123)
+	assert.Equal(t, 123, c.BillingAccountId)
 }
 
 func TestGetS3ApiURL(t *testing.T) {
@@ -21,8 +21,8 @@ func TestGetS3ApiURL(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.GetS3ApiURL(context.Background())
+	os := Client{H: c}
+	os.GetS3ApiURL(context.Background())
 }
 
 func TestGetS3UserInfo(t *testing.T) {
@@ -32,8 +32,8 @@ func TestGetS3UserInfo(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.GetS3UserInfo(context.Background())
+	os := Client{H: c}
+	os.GetS3UserInfo(context.Background())
 }
 
 func TestGetS3UserKeys(t *testing.T) {
@@ -43,8 +43,8 @@ func TestGetS3UserKeys(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.GetS3UserKeys(context.Background())
+	os := Client{H: c}
+	os.GetS3UserKeys(context.Background())
 }
 
 func TestGenerateS3UserKey(t *testing.T) {
@@ -54,8 +54,8 @@ func TestGenerateS3UserKey(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.GenerateS3UserKey(context.Background())
+	os := Client{H: c}
+	os.GenerateS3UserKey(context.Background())
 }
 
 func TestDeleteS3UserKey(t *testing.T) {
@@ -65,8 +65,8 @@ func TestDeleteS3UserKey(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.DeleteS3UserKey(context.Background(), "testKey")
+	os := Client{H: c}
+	os.DeleteS3UserKey(context.Background(), "testKey")
 }
 
 func TestListBuckets(t *testing.T) {
@@ -76,20 +76,20 @@ func TestListBuckets(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.ListBuckets(context.Background())
+	os := Client{H: c}
+	os.ListBuckets(context.Background())
 }
 
 func TestListBucketsWithBillingAccount(t *testing.T) {
 	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method)
-		assert.Equal(t, "/v1/storage/bucket/list?billing_account_id=testId", r.RequestURI)
+		assert.Equal(t, "/v1/storage/bucket/list?billing_account_id=123", r.RequestURI)
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.BillingAccountID = "testId"
-	osc.ListBuckets(context.Background())
+	os := Client{H: c}
+	os.BillingAccountId = 123
+	os.ListBuckets(context.Background())
 }
 
 func TestGetBucket(t *testing.T) {
@@ -99,8 +99,8 @@ func TestGetBucket(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.GetBucket(context.Background(), "testBucket")
+	os := Client{H: c}
+	os.GetBucket(context.Background(), "testBucket")
 }
 
 func TestCreateBucket(t *testing.T) {
@@ -113,8 +113,8 @@ func TestCreateBucket(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.CreateBucket(context.Background(), "testBucket")
+	os := Client{H: c}
+	os.CreateBucket(context.Background(), "testBucket")
 }
 
 func TestCreateBucketWithBillingAccount(t *testing.T) {
@@ -124,13 +124,13 @@ func TestCreateBucketWithBillingAccount(t *testing.T) {
 
 		_ = r.ParseForm()
 		assert.Equal(t, "testBucket", r.Form.Get("name"))
-		assert.Equal(t, "testId", r.Form.Get("billing_account_id"))
+		assert.Equal(t, "123", r.Form.Get("billing_account_id"))
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.BillingAccountID = "testId"
-	osc.CreateBucket(context.Background(), "testBucket")
+	os := Client{H: c}
+	os.BillingAccountId = 123
+	os.CreateBucket(context.Background(), "testBucket")
 }
 
 func TestDeleteBucket(t *testing.T) {
@@ -140,8 +140,8 @@ func TestDeleteBucket(t *testing.T) {
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.DeleteBucket(context.Background(), "testBucket")
+	os := Client{H: c}
+	os.DeleteBucket(context.Background(), "testBucket")
 }
 
 func TestUpdateBucketBillingAccount(t *testing.T) {
@@ -151,10 +151,10 @@ func TestUpdateBucketBillingAccount(t *testing.T) {
 
 		_ = r.ParseForm()
 		assert.Equal(t, "testBucket", r.Form.Get("name"))
-		assert.Equal(t, "testId", r.Form.Get("billing_account_id"))
+		assert.Equal(t, "123", r.Form.Get("billing_account_id"))
 	})
 	defer s.Close()
 
-	osc := ObjectStorageClient{H: c}
-	osc.UpdateBucketBillingAccount(context.Background(), "testBucket", "testId")
+	os := Client{H: c}
+	os.UpdateBucketBillingAccount(context.Background(), "testBucket", 123)
 }

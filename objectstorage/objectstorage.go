@@ -3,148 +3,138 @@ package objectstorage
 import (
 	"context"
 	"net/url"
+	"strconv"
 
 	"github.com/ekaputra07/idcloudhost-go/http"
 )
 
-type ObjectStorageClient struct {
-	BillingAccountID string
+func NewClient() *Client {
+	return &Client{
+		H: http.DefaultClient,
+	}
+}
+
+type Client struct {
+	BillingAccountId int
 	H                *http.Client
 }
 
-// ForBillingAccount set the value of BillingAccountID
-func (c *ObjectStorageClient) ForBillingAccount(id string) *ObjectStorageClient {
-	c.BillingAccountID = id
+// ForBillingAccount set the value of BillingAccountId
+func (c *Client) ForBillingAccount(id int) *Client {
+	c.BillingAccountId = id
 	return c
 }
 
 // GetS3ApiURL https://api.idcloudhost.com/#s3-api-info
-func (c *ObjectStorageClient) GetS3ApiURL(ctx context.Context) *http.ClientResponse {
-	cfg := http.RequestConfig{
+func (c *Client) GetS3ApiURL(ctx context.Context) *http.ClientResponse {
+	rc := http.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/api/s3",
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // GetS3UserInfo https://api.idcloudhost.com/#get-s3-user
-func (c *ObjectStorageClient) GetS3UserInfo(ctx context.Context) *http.ClientResponse {
-	cfg := http.RequestConfig{
+func (c *Client) GetS3UserInfo(ctx context.Context) *http.ClientResponse {
+	rc := http.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/user",
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // GetS3UserKeys https://api.idcloudhost.com/#get-keys
-func (c *ObjectStorageClient) GetS3UserKeys(ctx context.Context) *http.ClientResponse {
-	cfg := http.RequestConfig{
+func (c *Client) GetS3UserKeys(ctx context.Context) *http.ClientResponse {
+	rc := http.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/user/keys",
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // GenerateS3UserKey https://api.idcloudhost.com/#generate-key
-func (c *ObjectStorageClient) GenerateS3UserKey(ctx context.Context) *http.ClientResponse {
-	cfg := http.RequestConfig{
+func (c *Client) GenerateS3UserKey(ctx context.Context) *http.ClientResponse {
+	rc := http.RequestConfig{
 		Method: "POST",
 		Path:   "/v1/storage/user/keys",
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // DeleteS3UserKey https://api.idcloudhost.com/#generate-key
-func (c *ObjectStorageClient) DeleteS3UserKey(ctx context.Context, accessKey string) *http.ClientResponse {
-	q := url.Values{}
-	q.Add("access_key", accessKey)
-
-	cfg := http.RequestConfig{
+func (c *Client) DeleteS3UserKey(ctx context.Context, accessKey string) *http.ClientResponse {
+	rc := http.RequestConfig{
 		Method: "DELETE",
 		Path:   "/v1/storage/user/keys",
-		Query:  q,
+		Query:  url.Values{"access_key": []string{accessKey}},
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // ListBuckets https://api.idcloudhost.com/#list-buckets
-func (c *ObjectStorageClient) ListBuckets(ctx context.Context) *http.ClientResponse {
-	if c.BillingAccountID == "" {
-		cfg := http.RequestConfig{
+func (c *Client) ListBuckets(ctx context.Context) *http.ClientResponse {
+	if c.BillingAccountId == 0 {
+		rc := http.RequestConfig{
 			Method: "GET",
 			Path:   "/v1/storage/bucket/list",
 		}
-		return c.H.FormRequest(ctx, cfg)
+		return c.H.FormRequest(ctx, rc)
 	}
-	q := url.Values{}
-	q.Add("billing_account_id", c.BillingAccountID)
 
-	cfg := http.RequestConfig{
+	rc := http.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/bucket/list",
-		Query:  q,
+		Query:  url.Values{"billing_account_id": []string{strconv.Itoa(c.BillingAccountId)}},
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // GetBucket https://api.idcloudhost.com/#get-bucket
-func (c *ObjectStorageClient) GetBucket(ctx context.Context, name string) *http.ClientResponse {
-	q := url.Values{}
-	q.Add("name", name)
-
-	cfg := http.RequestConfig{
+func (c *Client) GetBucket(ctx context.Context, bucketName string) *http.ClientResponse {
+	rc := http.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/bucket",
-		Query:  q,
+		Query:  url.Values{"name": []string{bucketName}},
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // CreateBucket https://api.idcloudhost.com/#create-bucket
-func (c *ObjectStorageClient) CreateBucket(ctx context.Context, bucketName string) *http.ClientResponse {
-	d := url.Values{}
-	d.Add("name", bucketName)
-	if c.BillingAccountID != "" {
-		d.Add("billing_account_id", c.BillingAccountID)
+func (c *Client) CreateBucket(ctx context.Context, bucketName string) *http.ClientResponse {
+	d := url.Values{"name": []string{bucketName}}
+	if c.BillingAccountId != 0 {
+		d.Add("billing_account_id", strconv.Itoa(c.BillingAccountId))
 	}
 
-	cfg := http.RequestConfig{
+	rc := http.RequestConfig{
 		Method: "PUT",
 		Path:   "/v1/storage/bucket",
 		Data:   d,
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // DeleteBucket https://api.idcloudhost.com/#delete-bucket
-func (c *ObjectStorageClient) DeleteBucket(ctx context.Context, bucketName string) *http.ClientResponse {
-	q := url.Values{}
-	q.Add("name", bucketName)
-
-	cfg := http.RequestConfig{
+func (c *Client) DeleteBucket(ctx context.Context, bucketName string) *http.ClientResponse {
+	rc := http.RequestConfig{
 		Method: "DELETE",
 		Path:   "/v1/storage/bucket",
-		Query:  q,
+		Query:  url.Values{"name": []string{bucketName}},
 	}
-	return c.H.FormRequest(ctx, cfg)
+	return c.H.FormRequest(ctx, rc)
 }
 
 // UpdateBucketBillingAccount https://api.idcloudhost.com/#modify-bucket
-func (c *ObjectStorageClient) UpdateBucketBillingAccount(ctx context.Context, bucketName, billingAccountId string) *http.ClientResponse {
-	d := url.Values{}
-	d.Add("name", bucketName)
-	d.Add("billing_account_id", billingAccountId)
+func (c *Client) UpdateBucketBillingAccount(ctx context.Context, bucketName string, billingAccountId int) *http.ClientResponse {
+	d := url.Values{
+		"name":               []string{bucketName},
+		"billing_account_id": []string{strconv.Itoa(billingAccountId)},
+	}
 
-	cfg := http.RequestConfig{
+	rc := http.RequestConfig{
 		Method: "PATCH",
 		Path:   "/v1/storage/bucket",
 		Data:   d,
 	}
-	return c.H.FormRequest(ctx, cfg)
-}
-
-func NewClient() *ObjectStorageClient {
-	return &ObjectStorageClient{
-		H: http.DefaultClient,
-	}
+	return c.H.FormRequest(ctx, rc)
 }

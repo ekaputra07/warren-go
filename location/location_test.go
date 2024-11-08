@@ -16,6 +16,6 @@ func TestListLocations(t *testing.T) {
 	})
 	defer s.Close()
 
-	lc := LocationClient{H: c}
+	lc := Client{H: c}
 	lc.ListLocations(context.Background())
 }
