@@ -3,23 +3,23 @@ package location
 import (
 	"context"
 
-	"github.com/ekaputra07/idcloudhost-go/http"
+	"github.com/ekaputra07/warren-go/api"
 )
 
-func NewClient() *Client {
+func NewClient(client *api.API) *Client {
 	return &Client{
-		H: http.DefaultClient,
+		API: client,
 	}
 }
 
 type Client struct {
-	H *http.Client
+	API *api.API
 }
 
-func (c *Client) ListLocations(ctx context.Context) *http.ClientResponse {
-	rc := http.RequestConfig{
+func (c *Client) ListLocations(ctx context.Context) *api.ClientResponse {
+	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/config/locations",
 	}
-	return c.H.FormRequest(ctx, rc)
+	return c.API.FormRequest(ctx, rc)
 }

@@ -1,33 +1,19 @@
-package http
+package api
 
 import (
 	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewClient(t *testing.T) {
-	os.Setenv(ApiKeyEnvKey, "")
-	defer os.Setenv(ApiKeyEnvKey, "")
-
-	// no api key in Env variable
-	c := NewClient()
-	assert.Equal(t, "", c.ApiKey)
-	assert.Equal(t, BaseURL, c.BaseURL)
-
-	// api key set in Env variable
-	os.Setenv(ApiKeyEnvKey, "secret")
-	c = NewClient()
-	assert.Equal(t, "secret", c.ApiKey)
-
-	// api key manually set
-	c = NewClient().SetApiKey("secret-new")
-	assert.Equal(t, "secret-new", c.ApiKey)
+func TestNew(t *testing.T) {
+	c := New("https://api.warren.io", "secret")
+	assert.Equal(t, "https://api.warren.io", c.BaseURL)
+	assert.Equal(t, "secret", c.APIKey)
 }
 
 func TestFormRequest_NoContext(t *testing.T) {

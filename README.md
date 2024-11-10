@@ -1,9 +1,8 @@
-# idcloudhost-go
+# Warren Go!
 
-Unofficial Golang client library for IDCloudHost API.
+Golang client library for [Warren.io](https://warren.io/) API. If your cloud hosting provider is using Warren.io (and they enabled the API) then you should be able to manage your infrastructure programatically using this library.
 
 Progress:
-
 - [x] Locations
 - [x] Object storage
 - [x] Block storage
@@ -13,5 +12,61 @@ Progress:
 - [ ] Virtual machine
 - [x] Virtual Private Cloud (VPC)
 
+## Usage
+The easiest way to getting started is to set API's base URL and API Key in environment variables:
+```bash
+export WARREN_API_BASE_URL=https://api.idcloudhost.com
+export WARREN_API_KEY=secret123
+```
 
-> Disclaimer: This library is created solely based on information that are available on IDCloudHost API documentation website https://api.idcloudhost.com. The author(s) ONLY maintains/fixing-bugs/responsible for issues that are in the scope of this library, any platform issues should be addressed directly to the IDCloudHost official support.
+> NOTE: Please consult with your hosting provider for the API base URL. In this example I'm using `https://api.idcloudhost.com` which is one of hosting providers in Indonesia that are using Warren.io
+
+The in your Golang app:
+```golang
+package main
+
+import (
+	"context"
+	"github.com/ekaputra07/warren-go"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Warren client
+    w := warren.New()
+
+    // list locations
+    w.Location.ListLocations(ctx)
+
+    // list S3 buckets
+    w.ObjectStorage.ListBuckets(ctx)
+
+    // list VPC networks
+    w.VPC.ListNetworks(ctx, "sgp01")
+}
+```
+
+### Create multiple clients
+Above method works well if you're trying to connect to a single hosting provider. But what if your infrastructures are spread across multiple providers?
+
+You can create multiple instances of Warren that points to different providers:
+```golang
+import (
+	"context"
+	"github.com/ekaputra07/warren-go"
+    "github.com/ekaputra07/warren-go/api"
+)
+
+// Warren client for provider A
+apiA := api.New("https://api.a.com", "apiKeyFromA")
+wa := warren.Init(apiA)
+
+wa.Location.ListLocations(ctx)
+
+// Warren client for provider B
+apiB := api.New("https://api.b.com", "apiKeyFromB")
+wb := warren.Init(apiB)
+
+wb.Location.ListLocations(ctx)
+```

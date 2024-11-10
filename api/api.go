@@ -1,4 +1,4 @@
-package http
+package api
 
 import (
 	"context"
@@ -11,15 +11,12 @@ import (
 )
 
 const (
-	// ApiKeyEnvKey is the key used to get API Key from environment variable
-	ApiKeyEnvKey string = "IDCLOUDHOST_API_KEY"
-
-	// BaseURL is the base URL of the API
-	BaseURL string = "https://api.idcloudhost.com"
+	apiKeyEnvKey  string = "WARREN_API_KEY"
+	baseURLEnvKey string = "WARREN_API_BASE_URL"
 )
 
-// DefaultClient create Client with default configuration
-var DefaultClient *Client = NewClient()
+// Default creates API where both BaseURL and APIKey comes from environment variables.
+var Default *API = New(os.Getenv(baseURLEnvKey), os.Getenv(apiKeyEnvKey))
 
 // ClientResponse is a data structured returned by `doRequest()`.
 // To make the client compatible even when the server changed their response format.
@@ -29,21 +26,15 @@ type ClientResponse struct {
 	Body  []byte
 }
 
-// Client used to holds objects that are needed to make a HTTP call.
-type Client struct {
-	ApiKey     string
+// API used to holds objects that are needed to make a HTTP call.
+type API struct {
 	BaseURL    string
+	APIKey     string
 	HTTPClient *http.Client
 }
 
-// SetApiKey manually set API Key field
-func (c *Client) SetApiKey(key string) *Client {
-	c.ApiKey = key
-	return c
-}
-
 // FormRequest make a call with form-encoded payload
-func (c *Client) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
+func (c *API) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
 	req, err := c.buildRequest(ctx, cfg)
 	if err != nil {
 		return &ClientResponse{Error: err}
@@ -53,7 +44,7 @@ func (c *Client) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResp
 }
 
 // JsonRequest make a call with json-encoded payload
-func (c *Client) JSONRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
+func (c *API) JSONRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
 	req, err := c.buildRequest(ctx, cfg)
 	if err != nil {
 		return &ClientResponse{Error: err}
@@ -63,7 +54,7 @@ func (c *Client) JSONRequest(ctx context.Context, cfg RequestConfig) *ClientResp
 }
 
 // buildRequest wraps `http.NewRequestWithContext` and set necessary header for authentication.
-func (c *Client) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Request, error) {
+func (c *API) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Request, error) {
 	body, err := cfg.body()
 	if err != nil {
 		return nil, err
@@ -72,12 +63,12 @@ func (c *Client) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Req
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("apikey", c.ApiKey)
+	req.Header.Set("apikey", c.APIKey)
 	return req, nil
 }
 
 // doRequest doing the actual request
-func (c *Client) doRequest(req *http.Request) *ClientResponse {
+func (c *API) doRequest(req *http.Request) *ClientResponse {
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return &ClientResponse{Error: err}
@@ -101,20 +92,20 @@ func (c *Client) doRequest(req *http.Request) *ClientResponse {
 	return &ClientResponse{Body: b, Error: err}
 }
 
-// NewClient create an instance of Client
-func NewClient() *Client {
-	return &Client{
-		ApiKey:     os.Getenv(ApiKeyEnvKey),
-		BaseURL:    BaseURL,
+// New create an instance of API
+func New(baseURL, apiKey string) *API {
+	return &API{
+		BaseURL:    baseURL,
+		APIKey:     apiKey,
 		HTTPClient: http.DefaultClient,
 	}
 }
 
 // MockClientServer returns client and test server to simplify API call testing
-func MockClientServer(fn func(w http.ResponseWriter, r *http.Request)) (*Client, *httptest.Server) {
+func MockClientServer(fn func(w http.ResponseWriter, r *http.Request)) (*API, *httptest.Server) {
 	s := httptest.NewServer(http.HandlerFunc(fn))
-	c := &Client{
-		ApiKey:     "secret",
+	c := &API{
+		APIKey:     "secret",
 		BaseURL:    s.URL,
 		HTTPClient: s.Client(),
 	}

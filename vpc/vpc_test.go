@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	h "github.com/ekaputra07/idcloudhost-go/http"
+	"github.com/ekaputra07/warren-go/api"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,40 +18,40 @@ var (
 )
 
 func TestListNetworks(t *testing.T) {
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/networks", loc), r.RequestURI)
 	})
 	defer s.Close()
 
-	vpc := Client{H: c}
+	vpc := Client{API: a}
 	vpc.ListNetworks(context.Background(), loc)
 }
 
 func TestGetNetwork(t *testing.T) {
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/network/%s", loc, id), r.RequestURI)
 	})
 	defer s.Close()
 
-	vpc := Client{H: c}
+	vpc := Client{API: a}
 	vpc.GetNetwork(context.Background(), loc, id)
 }
 
 func TestDeleteNetwork(t *testing.T) {
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "DELETE", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/network/%s", loc, id), r.RequestURI)
 	})
 	defer s.Close()
 
-	vpc := Client{H: c}
+	vpc := Client{API: a}
 	vpc.DeleteNetwork(context.Background(), loc, id)
 }
 
 func TestRenameNetwork(t *testing.T) {
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PATCH", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/network/%s", loc, id), r.RequestURI)
 
@@ -61,28 +61,28 @@ func TestRenameNetwork(t *testing.T) {
 	})
 	defer s.Close()
 
-	vpc := Client{H: c}
+	vpc := Client{API: a}
 	vpc.RenameNetwork(context.Background(), loc, id, "Test")
 }
 
 func TestGetOrCreateDefaultNetwork(t *testing.T) {
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/network?name=Default", loc), r.RequestURI)
 	})
 	defer s.Close()
 
-	vpc := Client{H: c}
+	vpc := Client{API: a}
 	vpc.GetOrCreateDefaultNetwork(context.Background(), loc, "Default")
 }
 
 func TestSetDefaultNetwork(t *testing.T) {
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/network/%s/default", loc, id), r.RequestURI)
 	})
 	defer s.Close()
 
-	vpc := Client{H: c}
+	vpc := Client{API: a}
 	vpc.SetDefaultNetwork(context.Background(), loc, id)
 }

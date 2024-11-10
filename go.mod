@@ -1,4 +1,4 @@
-module github.com/ekaputra07/idcloudhost-go
+module github.com/ekaputra07/warren-go
 
 go 1.20
 

@@ -7,19 +7,19 @@ import (
 	"strconv"
 	"testing"
 
-	h "github.com/ekaputra07/idcloudhost-go/http"
+	"github.com/ekaputra07/warren-go/api"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestListDisks(t *testing.T) {
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method)
 		assert.Equal(t, "/v1/storage/disks", r.RequestURI)
 	})
 	defer s.Close()
 
-	bs := Client{H: c}
+	bs := Client{API: a}
 	bs.LisDisks(context.Background())
 }
 
@@ -30,7 +30,7 @@ func TestCreateDisk(t *testing.T) {
 		SourceImageType:  ImageTypeOSBase,
 		SourceImage:      "ubuntu_20.04",
 	}
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, "/v1/storage/disks", r.RequestURI)
 
@@ -43,38 +43,38 @@ func TestCreateDisk(t *testing.T) {
 	})
 	defer s.Close()
 
-	bs := Client{H: c}
+	bs := Client{API: a}
 	bs.CreateDisk(context.Background(), config)
 }
 
 func TestGetDisk(t *testing.T) {
 	id := uuid.New()
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/storage/disks/%s", id), r.RequestURI)
 	})
 	defer s.Close()
 
-	bs := Client{H: c}
+	bs := Client{API: a}
 	bs.GetDisk(context.Background(), id)
 }
 
 func TestDeleteDisk(t *testing.T) {
 	id := uuid.New()
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "DELETE", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/storage/disks/%s", id), r.RequestURI)
 	})
 	defer s.Close()
 
-	bs := Client{H: c}
+	bs := Client{API: a}
 	bs.DeleteDisk(context.Background(), id)
 }
 
 func TestAttachDiskToVM(t *testing.T) {
 	diskId := uuid.New()
 	vmId := uuid.New()
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, "/v1/user-resource/vm/storage/attach", r.RequestURI)
 
@@ -84,14 +84,14 @@ func TestAttachDiskToVM(t *testing.T) {
 	})
 	defer s.Close()
 
-	bs := Client{H: c}
+	bs := Client{API: a}
 	bs.AttachDiskToVM(context.Background(), diskId, vmId)
 }
 
 func TestDetachDiskFromVM(t *testing.T) {
 	diskId := uuid.New()
 	vmId := uuid.New()
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, "/v1/user-resource/vm/storage/detach", r.RequestURI)
 
@@ -101,13 +101,13 @@ func TestDetachDiskFromVM(t *testing.T) {
 	})
 	defer s.Close()
 
-	bs := Client{H: c}
+	bs := Client{API: a}
 	bs.DetachDiskFromVM(context.Background(), diskId, vmId)
 }
 
 func TestUpdateBucketBillingAccount(t *testing.T) {
 	id := uuid.New()
-	c, s := h.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PATCH", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/storage/disks/%s", id), r.RequestURI)
 
@@ -116,6 +116,6 @@ func TestUpdateBucketBillingAccount(t *testing.T) {
 	})
 	defer s.Close()
 
-	bs := Client{H: c}
+	bs := Client{API: a}
 	bs.UpdateDiskBillingAccount(context.Background(), id, 123)
 }

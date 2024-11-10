@@ -1,7 +1,7 @@
 package vpc
 
 import (
-	"github.com/ekaputra07/idcloudhost-go/http"
+	"github.com/ekaputra07/warren-go/api"
 	"github.com/google/uuid"
 )
 
@@ -20,5 +20,5 @@ type NetworkInfo struct {
 }
 
 type Client struct {
-	H *http.Client
+	API *api.API
 }

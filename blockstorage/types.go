@@ -1,11 +1,9 @@
 package blockstorage
 
-import (
-	"github.com/ekaputra07/idcloudhost-go/http"
-)
+import "github.com/ekaputra07/warren-go/api"
 
 type Client struct {
-	H *http.Client
+	API *api.API
 }
 
 type SourceImageType string
