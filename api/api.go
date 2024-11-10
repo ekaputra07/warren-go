@@ -34,42 +34,42 @@ type API struct {
 }
 
 // FormRequest make a call with form-encoded payload
-func (c *API) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
-	req, err := c.buildRequest(ctx, cfg)
+func (a *API) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
+	req, err := a.buildRequest(ctx, cfg)
 	if err != nil {
 		return &ClientResponse{Error: err}
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	return c.doRequest(req)
+	return a.doRequest(req)
 }
 
 // JsonRequest make a call with json-encoded payload
-func (c *API) JSONRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
-	req, err := c.buildRequest(ctx, cfg)
+func (a *API) JSONRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
+	req, err := a.buildRequest(ctx, cfg)
 	if err != nil {
 		return &ClientResponse{Error: err}
 	}
 	req.Header.Set("Content-Type", "application/json")
-	return c.doRequest(req)
+	return a.doRequest(req)
 }
 
 // buildRequest wraps `http.NewRequestWithContext` and set necessary header for authentication.
-func (c *API) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Request, error) {
+func (a *API) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Request, error) {
 	body, err := cfg.body()
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(cfg.Method), cfg.url(c.BaseURL), body)
+	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(cfg.Method), cfg.url(a.BaseURL), body)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("apikey", c.APIKey)
+	req.Header.Set("apikey", a.APIKey)
 	return req, nil
 }
 
 // doRequest doing the actual request
-func (c *API) doRequest(req *http.Request) *ClientResponse {
-	res, err := c.HTTPClient.Do(req)
+func (a *API) doRequest(req *http.Request) *ClientResponse {
+	res, err := a.HTTPClient.Do(req)
 	if err != nil {
 		return &ClientResponse{Error: err}
 	}
@@ -101,13 +101,13 @@ func New(baseURL, apiKey string) *API {
 	}
 }
 
-// MockClientServer returns client and test server to simplify API call testing
+// MockClientServer returns API client and test server to simplify API call testing
 func MockClientServer(fn func(w http.ResponseWriter, r *http.Request)) (*API, *httptest.Server) {
 	s := httptest.NewServer(http.HandlerFunc(fn))
-	c := &API{
+	a := &API{
 		APIKey:     "secret",
 		BaseURL:    s.URL,
 		HTTPClient: s.Client(),
 	}
-	return c, s
+	return a, s
 }

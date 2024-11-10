@@ -53,8 +53,8 @@ Above method works well if you're trying to connect to a single hosting provider
 You can create multiple instances of Warren that points to different providers:
 ```golang
 import (
-	"context"
-	"github.com/ekaputra07/warren-go"
+    "context"
+    "github.com/ekaputra07/warren-go"
     "github.com/ekaputra07/warren-go/api"
 )
 
