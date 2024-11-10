@@ -53,7 +53,6 @@ Above method works well if you're trying to connect to a single hosting provider
 You can create multiple instances of Warren that points to different providers:
 ```golang
 import (
-    "context"
     "github.com/ekaputra07/warren-go"
     "github.com/ekaputra07/warren-go/api"
 )
@@ -69,4 +68,22 @@ apiB := api.New("https://api.b.com", "apiKeyFromB")
 wb := warren.Init(apiB)
 
 wb.Location.ListLocations(ctx)
+```
+
+### Create client for specific module
+If you just want to create a client for specific module e.g. Object Storage, simply import and initialize your desired module.
+```golang
+import (
+    "github.com/ekaputra07/warren-go/api"
+    "github.com/ekaputra07/warren-go/objectstorage"
+)
+
+// using default API client
+c := objectstorage.NewClient(api.Default)
+c.ListBuckets(ctx)
+
+// OR manually setting base URL and API key
+a := api.New("https://api.idcloudhost.com", "secret")
+c2 := objectstorage.NewClient(a)
+c2.ListBuckets(ctx)
 ```
