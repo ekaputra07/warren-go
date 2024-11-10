@@ -53,7 +53,7 @@ func (c *Client) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResp
 }
 
 // JsonRequest make a call with json-encoded payload
-func (c *Client) JsonRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
+func (c *Client) JSONRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
 	req, err := c.buildRequest(ctx, cfg)
 	if err != nil {
 		return &ClientResponse{Error: err}

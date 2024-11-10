@@ -14,7 +14,7 @@ type RequestConfig struct {
 	Path   string
 	Query  url.Values
 	Data   url.Values
-	Json   map[string]interface{}
+	JSON   map[string]interface{}
 }
 
 // URL returns full request URL composed from baseURL, Path and Query field.
@@ -29,14 +29,14 @@ func (r RequestConfig) url(baseURL string) string {
 
 // body returns io.Reader either from Data or Json field
 func (r RequestConfig) body() (io.Reader, error) {
-	if r.Data != nil && r.Json != nil {
+	if r.Data != nil && r.JSON != nil {
 		return nil, errors.New("data and json can not be set at the same time")
 	}
 	if r.Data != nil {
 		return strings.NewReader(r.Data.Encode()), nil
 	}
-	if r.Json != nil {
-		jsonStr, err := json.Marshal(r.Json)
+	if r.JSON != nil {
+		jsonStr, err := json.Marshal(r.JSON)
 		if err != nil {
 			return nil, err
 		}

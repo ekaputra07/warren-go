@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"os"
@@ -123,5 +124,36 @@ func TestFormRequest(t *testing.T) {
 	}
 
 	resp := c.FormRequest(context.Background(), cfg)
+	assert.Equal(t, []byte("OK"), resp.Body)
+}
+
+func TestJSONRequest(t *testing.T) {
+	c, s := MockClientServer(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		assert.Equal(t, "/test", r.RequestURI)
+		assert.Equal(t, "secret", r.Header.Get("apikey"))
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+
+		var data map[string]interface{}
+		_ = json.NewDecoder(r.Body).Decode(&data)
+
+		assert.Equal(t, "test", data["name"])
+		assert.Equal(t, float64(20), data["age"])
+
+		w.Write([]byte("OK"))
+	})
+	defer s.Close()
+
+	json := map[string]interface{}{
+		"name": "test",
+		"age":  20,
+	}
+	cfg := RequestConfig{
+		Method: "POST",
+		Path:   "/test",
+		JSON:   json,
+	}
+
+	resp := c.JSONRequest(context.Background(), cfg)
 	assert.Equal(t, []byte("OK"), resp.Body)
 }
