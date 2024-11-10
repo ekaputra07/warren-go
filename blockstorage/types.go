@@ -18,8 +18,8 @@ const (
 )
 
 type CreateDiskConfig struct {
-	SizeGb           int             `schema:"size_gb"`
-	BillingAccountId int             `schema:"billing_account_id"`
+	SizeGB           int             `schema:"size_gb"`
+	BillingAccountID int             `schema:"billing_account_id"`
 	SourceImageType  SourceImageType `schema:"source_image_type,default:EMPTY"`
 	SourceImage      string          `schema:"source_image"`
 }

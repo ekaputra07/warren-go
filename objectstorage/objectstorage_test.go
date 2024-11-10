@@ -11,7 +11,7 @@ import (
 
 func ForBillingAccount(t *testing.T) {
 	c := NewClient().ForBillingAccount(123)
-	assert.Equal(t, 123, c.BillingAccountId)
+	assert.Equal(t, 123, c.BillingAccountID)
 }
 
 func TestGetS3ApiURL(t *testing.T) {
@@ -88,7 +88,7 @@ func TestListBucketsWithBillingAccount(t *testing.T) {
 	defer s.Close()
 
 	os := Client{H: c}
-	os.BillingAccountId = 123
+	os.BillingAccountID = 123
 	os.ListBuckets(context.Background())
 }
 
@@ -129,7 +129,7 @@ func TestCreateBucketWithBillingAccount(t *testing.T) {
 	defer s.Close()
 
 	os := Client{H: c}
-	os.BillingAccountId = 123
+	os.BillingAccountID = 123
 	os.CreateBucket(context.Background(), "testBucket")
 }
 

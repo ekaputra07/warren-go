@@ -15,13 +15,13 @@ func NewClient() *Client {
 }
 
 type Client struct {
-	BillingAccountId int
+	BillingAccountID int
 	H                *http.Client
 }
 
-// ForBillingAccount set the value of BillingAccountId
+// ForBillingAccount set the value of BillingAccountID
 func (c *Client) ForBillingAccount(id int) *Client {
-	c.BillingAccountId = id
+	c.BillingAccountID = id
 	return c
 }
 
@@ -73,7 +73,7 @@ func (c *Client) DeleteS3UserKey(ctx context.Context, accessKey string) *http.Cl
 
 // ListBuckets https://api.idcloudhost.com/#list-buckets
 func (c *Client) ListBuckets(ctx context.Context) *http.ClientResponse {
-	if c.BillingAccountId == 0 {
+	if c.BillingAccountID == 0 {
 		rc := http.RequestConfig{
 			Method: "GET",
 			Path:   "/v1/storage/bucket/list",
@@ -84,7 +84,7 @@ func (c *Client) ListBuckets(ctx context.Context) *http.ClientResponse {
 	rc := http.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/bucket/list",
-		Query:  url.Values{"billing_account_id": []string{strconv.Itoa(c.BillingAccountId)}},
+		Query:  url.Values{"billing_account_id": []string{strconv.Itoa(c.BillingAccountID)}},
 	}
 	return c.H.FormRequest(ctx, rc)
 }
@@ -102,8 +102,8 @@ func (c *Client) GetBucket(ctx context.Context, bucketName string) *http.ClientR
 // CreateBucket https://api.idcloudhost.com/#create-bucket
 func (c *Client) CreateBucket(ctx context.Context, bucketName string) *http.ClientResponse {
 	d := url.Values{"name": []string{bucketName}}
-	if c.BillingAccountId != 0 {
-		d.Add("billing_account_id", strconv.Itoa(c.BillingAccountId))
+	if c.BillingAccountID != 0 {
+		d.Add("billing_account_id", strconv.Itoa(c.BillingAccountID))
 	}
 
 	rc := http.RequestConfig{
@@ -125,10 +125,10 @@ func (c *Client) DeleteBucket(ctx context.Context, bucketName string) *http.Clie
 }
 
 // UpdateBucketBillingAccount https://api.idcloudhost.com/#modify-bucket
-func (c *Client) UpdateBucketBillingAccount(ctx context.Context, bucketName string, billingAccountId int) *http.ClientResponse {
+func (c *Client) UpdateBucketBillingAccount(ctx context.Context, bucketName string, billingAccountID int) *http.ClientResponse {
 	d := url.Values{
 		"name":               []string{bucketName},
-		"billing_account_id": []string{strconv.Itoa(billingAccountId)},
+		"billing_account_id": []string{strconv.Itoa(billingAccountID)},
 	}
 
 	rc := http.RequestConfig{

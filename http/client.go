@@ -14,8 +14,8 @@ const (
 	// ApiKeyEnvKey is the key used to get API Key from environment variable
 	ApiKeyEnvKey string = "IDCLOUDHOST_API_KEY"
 
-	// BaseUrl is the base URL of the API
-	BaseUrl string = "https://api.idcloudhost.com"
+	// BaseURL is the base URL of the API
+	BaseURL string = "https://api.idcloudhost.com"
 )
 
 // DefaultClient create Client with default configuration
@@ -32,7 +32,7 @@ type ClientResponse struct {
 // Client used to holds objects that are needed to make a HTTP call.
 type Client struct {
 	ApiKey     string
-	BaseUrl    string
+	BaseURL    string
 	HTTPClient *http.Client
 }
 
@@ -68,7 +68,7 @@ func (c *Client) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Req
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(cfg.Method), cfg.url(c.BaseUrl), body)
+	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(cfg.Method), cfg.url(c.BaseURL), body)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (c *Client) doRequest(req *http.Request) *ClientResponse {
 func NewClient() *Client {
 	return &Client{
 		ApiKey:     os.Getenv(ApiKeyEnvKey),
-		BaseUrl:    BaseUrl,
+		BaseURL:    BaseURL,
 		HTTPClient: http.DefaultClient,
 	}
 }
@@ -115,7 +115,7 @@ func MockClientServer(fn func(w http.ResponseWriter, r *http.Request)) (*Client,
 	s := httptest.NewServer(http.HandlerFunc(fn))
 	c := &Client{
 		ApiKey:     "secret",
-		BaseUrl:    s.URL,
+		BaseURL:    s.URL,
 		HTTPClient: s.Client(),
 	}
 	return c, s

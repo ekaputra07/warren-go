@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/ekaputra07/idcloudhost-go/http"
+	"github.com/google/uuid"
 	"github.com/gorilla/schema"
 )
 
@@ -42,28 +43,28 @@ func (c *Client) CreateDisk(ctx context.Context, cfg CreateDiskConfig) *http.Cli
 }
 
 // GetDisk https://api.idcloudhost.com/#get-disk
-func (c *Client) GetDisk(ctx context.Context, diskId string) *http.ClientResponse {
+func (c *Client) GetDisk(ctx context.Context, diskID uuid.UUID) *http.ClientResponse {
 	rc := http.RequestConfig{
 		Method: "GET",
-		Path:   fmt.Sprintf("/v1/storage/disks/%s", diskId),
+		Path:   fmt.Sprintf("/v1/storage/disks/%s", diskID),
 	}
 	return c.H.FormRequest(ctx, rc)
 }
 
 // DeleteDisk https://api.idcloudhost.com/#delete-disk
-func (c *Client) DeleteDisk(ctx context.Context, diskId string) *http.ClientResponse {
+func (c *Client) DeleteDisk(ctx context.Context, diskID uuid.UUID) *http.ClientResponse {
 	rc := http.RequestConfig{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/v1/storage/disks/%s", diskId),
+		Path:   fmt.Sprintf("/v1/storage/disks/%s", diskID),
 	}
 	return c.H.FormRequest(ctx, rc)
 }
 
 // AttachDiskToVM https://api.idcloudhost.com/#attach-disk
-func (c *Client) AttachDiskToVM(ctx context.Context, diskId, vmId string) *http.ClientResponse {
+func (c *Client) AttachDiskToVM(ctx context.Context, diskID, vmID uuid.UUID) *http.ClientResponse {
 	d := url.Values{
-		"uuid":         []string{vmId},
-		"storage_uuid": []string{diskId},
+		"uuid":         []string{vmID.String()},
+		"storage_uuid": []string{diskID.String()},
 	}
 	rc := http.RequestConfig{
 		Method: "POST",
@@ -74,10 +75,10 @@ func (c *Client) AttachDiskToVM(ctx context.Context, diskId, vmId string) *http.
 }
 
 // DetachDiskFromVM https://api.idcloudhost.com/#detach-disk
-func (c *Client) DetachDiskFromVM(ctx context.Context, diskId, vmId string) *http.ClientResponse {
+func (c *Client) DetachDiskFromVM(ctx context.Context, diskID, vmID uuid.UUID) *http.ClientResponse {
 	d := url.Values{
-		"uuid":         []string{vmId},
-		"storage_uuid": []string{diskId},
+		"uuid":         []string{vmID.String()},
+		"storage_uuid": []string{diskID.String()},
 	}
 	rc := http.RequestConfig{
 		Method: "POST",
@@ -88,11 +89,11 @@ func (c *Client) DetachDiskFromVM(ctx context.Context, diskId, vmId string) *htt
 }
 
 // UpdateDiskBillingAccount https://api.idcloudhost.com/#modify-disk-info
-func (c *Client) UpdateDiskBillingAccount(ctx context.Context, diskId string, billingAccountId int) *http.ClientResponse {
+func (c *Client) UpdateDiskBillingAccount(ctx context.Context, diskID uuid.UUID, billingAccountID int) *http.ClientResponse {
 	rc := http.RequestConfig{
 		Method: "PATCH",
-		Path:   fmt.Sprintf("/v1/storage/disks/%s", diskId),
-		Data:   url.Values{"billing_account_id": []string{strconv.Itoa(billingAccountId)}},
+		Path:   fmt.Sprintf("/v1/storage/disks/%s", diskID),
+		Data:   url.Values{"billing_account_id": []string{strconv.Itoa(billingAccountID)}},
 	}
 	return c.H.FormRequest(ctx, rc)
 }

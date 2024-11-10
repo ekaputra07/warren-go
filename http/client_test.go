@@ -17,7 +17,7 @@ func TestNewClient(t *testing.T) {
 	// no api key in Env variable
 	c := NewClient()
 	assert.Equal(t, "", c.ApiKey)
-	assert.Equal(t, BaseUrl, c.BaseUrl)
+	assert.Equal(t, BaseURL, c.BaseURL)
 
 	// api key set in Env variable
 	os.Setenv(ApiKeyEnvKey, "secret")
