@@ -6,7 +6,7 @@ Progress:
 - [x] Locations
 - [x] Object storage
 - [x] Block storage
-- [ ] Floating IP
+- [x] Floating IP
 - [ ] Load balancer
 - [ ] Managed services
 - [ ] Virtual machine
@@ -86,4 +86,24 @@ c.ListBuckets(ctx)
 a := api.New("https://api.idcloudhost.com", "secret")
 c2 := objectstorage.NewClient(a)
 c2.ListBuckets(ctx)
+```
+
+### Create client with data center location
+Some resource will require us to specify data center location.
+```golang
+import (
+    "github.com/ekaputra07/warren-go/api"
+    "github.com/ekaputra07/warren-go/vpc"
+)
+
+ctx := context.Background()
+
+// Warren client with location
+w := warren.NewWithLocation("jkt01")
+w.VPC.ListNetworks(ctx)
+
+// OR manually created client
+a := api.New("https://api.idcloudhost.com", "secret")
+v := vpc.NewClient(a, "jkt01")
+v.ListNetworks(ctx)
 ```

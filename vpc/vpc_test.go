@@ -24,8 +24,8 @@ func TestListNetworks(t *testing.T) {
 	})
 	defer s.Close()
 
-	vpc := Client{API: a}
-	vpc.ListNetworks(context.Background(), loc)
+	vpc := Client{API: a, Location: loc}
+	vpc.ListNetworks(context.Background())
 }
 
 func TestGetNetwork(t *testing.T) {
@@ -35,8 +35,8 @@ func TestGetNetwork(t *testing.T) {
 	})
 	defer s.Close()
 
-	vpc := Client{API: a}
-	vpc.GetNetwork(context.Background(), loc, id)
+	vpc := Client{API: a, Location: loc}
+	vpc.GetNetwork(context.Background(), id)
 }
 
 func TestDeleteNetwork(t *testing.T) {
@@ -46,8 +46,8 @@ func TestDeleteNetwork(t *testing.T) {
 	})
 	defer s.Close()
 
-	vpc := Client{API: a}
-	vpc.DeleteNetwork(context.Background(), loc, id)
+	vpc := Client{API: a, Location: loc}
+	vpc.DeleteNetwork(context.Background(), id)
 }
 
 func TestRenameNetwork(t *testing.T) {
@@ -61,8 +61,8 @@ func TestRenameNetwork(t *testing.T) {
 	})
 	defer s.Close()
 
-	vpc := Client{API: a}
-	vpc.RenameNetwork(context.Background(), loc, id, "Test")
+	vpc := Client{API: a, Location: loc}
+	vpc.RenameNetwork(context.Background(), id, "Test")
 }
 
 func TestGetOrCreateDefaultNetwork(t *testing.T) {
@@ -72,8 +72,8 @@ func TestGetOrCreateDefaultNetwork(t *testing.T) {
 	})
 	defer s.Close()
 
-	vpc := Client{API: a}
-	vpc.GetOrCreateDefaultNetwork(context.Background(), loc, "Default")
+	vpc := Client{API: a, Location: loc}
+	vpc.GetOrCreateDefaultNetwork(context.Background(), "Default")
 }
 
 func TestSetDefaultNetwork(t *testing.T) {
@@ -83,6 +83,6 @@ func TestSetDefaultNetwork(t *testing.T) {
 	})
 	defer s.Close()
 
-	vpc := Client{API: a}
-	vpc.SetDefaultNetwork(context.Background(), loc, id)
+	vpc := Client{API: a, Location: loc}
+	vpc.SetDefaultNetwork(context.Background(), id)
 }

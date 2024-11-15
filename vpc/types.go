@@ -5,6 +5,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type Client struct {
+	API      *api.API
+	Location string
+}
+
 type NetworkInfo struct {
 	VLANID        int        `json:"vlan_id"`
 	UUID          uuid.UUID  `json:"uuid"`
@@ -17,8 +22,4 @@ type NetworkInfo struct {
 	VMUUIDs       uuid.UUIDs `json:"vm_uuids"`
 	CreatedAt     string     `json:"created_at"`
 	UpdatedAt     string     `json:"updated_at"`
-}
-
-type Client struct {
-	API *api.API
 }

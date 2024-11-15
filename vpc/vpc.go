@@ -10,17 +10,18 @@ import (
 	"github.com/google/uuid"
 )
 
-func NewClient(client *api.API) *Client {
+func NewClient(client *api.API, location string) *Client {
 	return &Client{
-		API: client,
+		API:      client,
+		Location: location,
 	}
 }
 
 // ListNetworks https://api.warren.io/#list-networks
-func (c *Client) ListNetworks(ctx context.Context, location string) (*[]NetworkInfo, error) {
+func (c *Client) ListNetworks(ctx context.Context) (*[]NetworkInfo, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
-		Path:   fmt.Sprintf("/v1/%s/network/networks", location),
+		Path:   fmt.Sprintf("/v1/%s/network/networks", c.Location),
 	}
 	res := c.API.JSONRequest(ctx, rc)
 	if res.Error != nil {
@@ -34,10 +35,10 @@ func (c *Client) ListNetworks(ctx context.Context, location string) (*[]NetworkI
 }
 
 // GetNetwork https://api.warren.io/#get-network-data
-func (c *Client) GetNetwork(ctx context.Context, location string, id uuid.UUID) (*NetworkInfo, error) {
+func (c *Client) GetNetwork(ctx context.Context, id uuid.UUID) (*NetworkInfo, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
-		Path:   fmt.Sprintf("/v1/%s/network/network/%s", location, id),
+		Path:   fmt.Sprintf("/v1/%s/network/network/%s", c.Location, id),
 	}
 	res := c.API.JSONRequest(ctx, rc)
 	if res.Error != nil {
@@ -51,10 +52,10 @@ func (c *Client) GetNetwork(ctx context.Context, location string, id uuid.UUID) 
 }
 
 // DeleteNetwork https://api.warren.io/#delete-network
-func (c *Client) DeleteNetwork(ctx context.Context, location string, id uuid.UUID) error {
+func (c *Client) DeleteNetwork(ctx context.Context, id uuid.UUID) error {
 	rc := api.RequestConfig{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/v1/%s/network/network/%s", location, id),
+		Path:   fmt.Sprintf("/v1/%s/network/network/%s", c.Location, id),
 	}
 	res := c.API.JSONRequest(ctx, rc)
 	if res.Error != nil {
@@ -64,10 +65,10 @@ func (c *Client) DeleteNetwork(ctx context.Context, location string, id uuid.UUI
 }
 
 // RenameNetwork https://api.warren.io/#change-network-name
-func (c *Client) RenameNetwork(ctx context.Context, location string, id uuid.UUID, newName string) error {
+func (c *Client) RenameNetwork(ctx context.Context, id uuid.UUID, newName string) error {
 	rc := api.RequestConfig{
 		Method: "PATCH",
-		Path:   fmt.Sprintf("/v1/%s/network/network/%s", location, id),
+		Path:   fmt.Sprintf("/v1/%s/network/network/%s", c.Location, id),
 		JSON:   map[string]interface{}{"name": newName},
 	}
 	res := c.API.JSONRequest(ctx, rc)
@@ -78,10 +79,10 @@ func (c *Client) RenameNetwork(ctx context.Context, location string, id uuid.UUI
 }
 
 // GetOrCreateDefaultNetwork https://api.warren.io/#create-or-get-default-network
-func (c *Client) GetOrCreateDefaultNetwork(ctx context.Context, location string, name string) (*NetworkInfo, error) {
+func (c *Client) GetOrCreateDefaultNetwork(ctx context.Context, name string) (*NetworkInfo, error) {
 	rc := api.RequestConfig{
 		Method: "POST",
-		Path:   fmt.Sprintf("/v1/%s/network/network", location),
+		Path:   fmt.Sprintf("/v1/%s/network/network", c.Location),
 		Query:  url.Values{"name": []string{name}},
 	}
 	res := c.API.JSONRequest(ctx, rc)
@@ -96,10 +97,10 @@ func (c *Client) GetOrCreateDefaultNetwork(ctx context.Context, location string,
 }
 
 // SetDefaultNetwork https://api.warren.io/#change-network-to-default
-func (c *Client) SetDefaultNetwork(ctx context.Context, location string, id uuid.UUID) error {
+func (c *Client) SetDefaultNetwork(ctx context.Context, id uuid.UUID) error {
 	rc := api.RequestConfig{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/v1/%s/network/network/%s/default", location, id),
+		Path:   fmt.Sprintf("/v1/%s/network/network/%s/default", c.Location, id),
 	}
 	res := c.API.JSONRequest(ctx, rc)
 	if res.Error != nil {
