@@ -67,7 +67,7 @@ func TestGetFloatingIP(t *testing.T) {
 func TestUpdateFloatingIP(t *testing.T) {
 	a, s := api.MockClientServer(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PATCH", r.Method)
-		assert.Equal(t, fmt.Sprintf("/v1/%s/network/ip_addresses", loc), r.RequestURI)
+		assert.Equal(t, fmt.Sprintf("/v1/%s/network/ip_addresses/%s", loc, address), r.RequestURI)
 
 		var data map[string]interface{}
 		_ = json.NewDecoder(r.Body).Decode(&data)
@@ -77,7 +77,7 @@ func TestUpdateFloatingIP(t *testing.T) {
 	defer s.Close()
 
 	ip := Client{API: a, Location: loc}
-	info := IPAddressInfo{Name: "Test"}
+	info := IPAddressInfo{Name: "Test", Address: address}
 
 	// BillingAccountID not set
 	err := ip.UpdateFloatingIP(context.Background(), &info)

@@ -82,7 +82,7 @@ func (c *Client) UpdateFloatingIP(ctx context.Context, info *IPAddressInfo) erro
 
 	rc := api.RequestConfig{
 		Method: "PATCH",
-		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses", c.Location),
+		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses/%s", c.Location, info.Address),
 		JSON: map[string]interface{}{
 			"name":               info.Name,
 			"billing_account_id": info.BillingAccountID,
