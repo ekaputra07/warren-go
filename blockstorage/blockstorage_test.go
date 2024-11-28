@@ -24,7 +24,7 @@ func TestListDisks(t *testing.T) {
 }
 
 func TestCreateDisk(t *testing.T) {
-	config := CreateDiskConfig{
+	disk := Disk{
 		SizeGB:           10,
 		BillingAccountID: 123,
 		SourceImageType:  ImageTypeOSBase,
@@ -36,15 +36,15 @@ func TestCreateDisk(t *testing.T) {
 
 		_ = r.ParseForm()
 
-		assert.Equal(t, strconv.Itoa(config.SizeGB), r.Form.Get("size_gb"))
-		assert.Equal(t, strconv.Itoa(config.BillingAccountID), r.Form.Get("billing_account_id"))
+		assert.Equal(t, strconv.Itoa(disk.SizeGB), r.Form.Get("size_gb"))
+		assert.Equal(t, strconv.Itoa(disk.BillingAccountID), r.Form.Get("billing_account_id"))
 		assert.Equal(t, string(ImageTypeOSBase), r.Form.Get("source_image_type"))
-		assert.Equal(t, config.SourceImage, r.Form.Get("source_image"))
+		assert.Equal(t, disk.SourceImage, r.Form.Get("source_image"))
 	})
 	defer s.Close()
 
 	bs := Client{API: a}
-	bs.CreateDisk(context.Background(), config)
+	bs.CreateDisk(context.Background(), &disk)
 }
 
 func TestGetDisk(t *testing.T) {
