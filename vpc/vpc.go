@@ -18,7 +18,7 @@ func NewClient(client *api.API, location string) *Client {
 }
 
 // ListNetworks https://api.warren.io/#list-networks
-func (c *Client) ListNetworks(ctx context.Context) (*[]NetworkInfo, error) {
+func (c *Client) ListNetworks(ctx context.Context) ([]NetworkInfo, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v1/%s/network/networks", c.Location),
@@ -27,28 +27,28 @@ func (c *Client) ListNetworks(ctx context.Context) (*[]NetworkInfo, error) {
 	if res.Error != nil {
 		return nil, res.Error
 	}
-	var i []NetworkInfo
-	if err := json.Unmarshal(res.Body, &i); err != nil {
+	var ni []NetworkInfo
+	if err := json.Unmarshal(res.Body, &ni); err != nil {
 		return nil, err
 	}
-	return &i, nil
+	return ni, nil
 }
 
 // GetNetwork https://api.warren.io/#get-network-data
-func (c *Client) GetNetwork(ctx context.Context, id uuid.UUID) (*NetworkInfo, error) {
+func (c *Client) GetNetwork(ctx context.Context, id uuid.UUID) (NetworkInfo, error) {
+	var ni NetworkInfo
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v1/%s/network/network/%s", c.Location, id),
 	}
 	res := c.API.JSONRequest(ctx, rc)
 	if res.Error != nil {
-		return nil, res.Error
+		return ni, res.Error
 	}
-	var i NetworkInfo
-	if err := json.Unmarshal(res.Body, &i); err != nil {
-		return nil, err
+	if err := json.Unmarshal(res.Body, &ni); err != nil {
+		return ni, err
 	}
-	return &i, nil
+	return ni, nil
 }
 
 // DeleteNetwork https://api.warren.io/#delete-network
@@ -57,11 +57,7 @@ func (c *Client) DeleteNetwork(ctx context.Context, id uuid.UUID) error {
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/v1/%s/network/network/%s", c.Location, id),
 	}
-	res := c.API.JSONRequest(ctx, rc)
-	if res.Error != nil {
-		return res.Error
-	}
-	return nil
+	return c.API.JSONRequest(ctx, rc).Error
 }
 
 // RenameNetwork https://api.warren.io/#change-network-name
@@ -69,17 +65,14 @@ func (c *Client) RenameNetwork(ctx context.Context, id uuid.UUID, newName string
 	rc := api.RequestConfig{
 		Method: "PATCH",
 		Path:   fmt.Sprintf("/v1/%s/network/network/%s", c.Location, id),
-		JSON:   map[string]interface{}{"name": newName},
+		JSON:   map[string]any{"name": newName},
 	}
-	res := c.API.JSONRequest(ctx, rc)
-	if res.Error != nil {
-		return res.Error
-	}
-	return nil
+	return c.API.JSONRequest(ctx, rc).Error
 }
 
 // GetOrCreateDefaultNetwork https://api.warren.io/#create-or-get-default-network
-func (c *Client) GetOrCreateDefaultNetwork(ctx context.Context, name string) (*NetworkInfo, error) {
+func (c *Client) GetOrCreateDefaultNetwork(ctx context.Context, name string) (NetworkInfo, error) {
+	var ni NetworkInfo
 	rc := api.RequestConfig{
 		Method: "POST",
 		Path:   fmt.Sprintf("/v1/%s/network/network", c.Location),
@@ -87,13 +80,12 @@ func (c *Client) GetOrCreateDefaultNetwork(ctx context.Context, name string) (*N
 	}
 	res := c.API.JSONRequest(ctx, rc)
 	if res.Error != nil {
-		return nil, res.Error
+		return ni, res.Error
 	}
-	var i NetworkInfo
-	if err := json.Unmarshal(res.Body, &i); err != nil {
-		return nil, err
+	if err := json.Unmarshal(res.Body, &ni); err != nil {
+		return ni, err
 	}
-	return &i, nil
+	return ni, nil
 }
 
 // SetDefaultNetwork https://api.warren.io/#change-network-to-default
@@ -102,9 +94,5 @@ func (c *Client) SetDefaultNetwork(ctx context.Context, id uuid.UUID) error {
 		Method: "PUT",
 		Path:   fmt.Sprintf("/v1/%s/network/network/%s/default", c.Location, id),
 	}
-	res := c.API.JSONRequest(ctx, rc)
-	if res.Error != nil {
-		return res.Error
-	}
-	return nil
+	return c.API.JSONRequest(ctx, rc).Error
 }

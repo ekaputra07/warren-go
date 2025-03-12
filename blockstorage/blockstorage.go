@@ -19,7 +19,7 @@ func NewClient(client *api.API) *Client {
 }
 
 // ListDisks https://api.warren.io/#list-disks
-func (c *Client) LisDisks(ctx context.Context) (*[]Disk, error) {
+func (c *Client) ListDisks(ctx context.Context) ([]Disk, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/disks",
@@ -32,7 +32,7 @@ func (c *Client) LisDisks(ctx context.Context) (*[]Disk, error) {
 	if err := json.Unmarshal(resp.Body, &disks); err != nil {
 		return nil, err
 	}
-	return &disks, nil
+	return disks, nil
 }
 
 // CreateDisk https://api.warren.io/#create-disk
@@ -56,20 +56,20 @@ func (c *Client) CreateDisk(ctx context.Context, disk *Disk) error {
 }
 
 // GetDisk https://api.warren.io/#get-disk
-func (c *Client) GetDisk(ctx context.Context, diskID uuid.UUID) (*Disk, error) {
+func (c *Client) GetDisk(ctx context.Context, diskID uuid.UUID) (Disk, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v1/storage/disks/%s", diskID),
 	}
 	resp := c.API.FormRequest(ctx, rc)
 	if resp.Error != nil {
-		return nil, resp.Error
+		return Disk{}, resp.Error
 	}
 	var disk Disk
 	if err := json.Unmarshal(resp.Body, &disk); err != nil {
-		return nil, err
+		return Disk{}, err
 	}
-	return &disk, nil
+	return disk, nil
 }
 
 // DeleteDisk https://api.warren.io/#delete-disk

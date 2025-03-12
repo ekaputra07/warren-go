@@ -29,7 +29,7 @@ type Client struct {
 }
 
 // ListLocations https://api.warren.io/#list-locations
-func (c *Client) ListLocations(ctx context.Context) (*[]Location, error) {
+func (c *Client) ListLocations(ctx context.Context) ([]Location, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/config/locations",
@@ -43,5 +43,5 @@ func (c *Client) ListLocations(ctx context.Context) (*[]Location, error) {
 	if err := json.Unmarshal(resp.Body, &locations); err != nil {
 		return nil, err
 	}
-	return &locations, nil
+	return locations, nil
 }

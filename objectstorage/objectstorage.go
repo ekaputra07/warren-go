@@ -22,7 +22,7 @@ func (c *Client) ForBillingAccount(id int) *Client {
 }
 
 // GetS3ApiURL https://api.warren.io/#s3-api-info
-func (c *Client) GetS3ApiURL(ctx context.Context) (*map[string]string, error) {
+func (c *Client) GetS3ApiURL(ctx context.Context) (map[string]string, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/api/s3",
@@ -35,28 +35,28 @@ func (c *Client) GetS3ApiURL(ctx context.Context) (*map[string]string, error) {
 	if err := json.Unmarshal(resp.Body, &data); err != nil {
 		return nil, err
 	}
-	return &data, nil
+	return data, nil
 }
 
 // GetS3UserInfo https://api.warren.io/#get-s3-user
-func (c *Client) GetS3UserInfo(ctx context.Context) (*S3UserInfo, error) {
+func (c *Client) GetS3UserInfo(ctx context.Context) (S3UserInfo, error) {
+	var info S3UserInfo
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/user",
 	}
 	resp := c.API.FormRequest(ctx, rc)
 	if resp.Error != nil {
-		return nil, resp.Error
+		return info, resp.Error
 	}
-	var info S3UserInfo
 	if err := json.Unmarshal(resp.Body, &info); err != nil {
-		return nil, err
+		return info, err
 	}
-	return &info, nil
+	return info, nil
 }
 
 // GetS3UserKeys https://api.warren.io/#get-keys
-func (c *Client) GetS3UserKeys(ctx context.Context) (*[]S3Credential, error) {
+func (c *Client) GetS3UserKeys(ctx context.Context) ([]S3Credential, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/user/keys",
@@ -69,11 +69,11 @@ func (c *Client) GetS3UserKeys(ctx context.Context) (*[]S3Credential, error) {
 	if err := json.Unmarshal(resp.Body, &credentials); err != nil {
 		return nil, err
 	}
-	return &credentials, nil
+	return credentials, nil
 }
 
 // GenerateS3UserKey https://api.warren.io/#generate-key
-func (c *Client) GenerateS3UserKey(ctx context.Context) (*[]S3Credential, error) {
+func (c *Client) GenerateS3UserKey(ctx context.Context) ([]S3Credential, error) {
 	rc := api.RequestConfig{
 		Method: "POST",
 		Path:   "/v1/storage/user/keys",
@@ -86,7 +86,7 @@ func (c *Client) GenerateS3UserKey(ctx context.Context) (*[]S3Credential, error)
 	if err := json.Unmarshal(resp.Body, &credentials); err != nil {
 		return nil, err
 	}
-	return &credentials, nil
+	return credentials, nil
 }
 
 // DeleteS3UserKey https://api.warren.io/#generate-key
@@ -100,8 +100,8 @@ func (c *Client) DeleteS3UserKey(ctx context.Context, accessKey string) error {
 }
 
 // ListBuckets https://api.warren.io/#list-buckets
-func (c *Client) ListBuckets(ctx context.Context) (*[]S3Bucket, error) {
-	var resp *api.ClientResponse
+func (c *Client) ListBuckets(ctx context.Context) ([]S3Bucket, error) {
+	var resp api.ClientResponse
 
 	if c.BillingAccountID == 0 {
 		rc := api.RequestConfig{
@@ -125,11 +125,12 @@ func (c *Client) ListBuckets(ctx context.Context) (*[]S3Bucket, error) {
 	if err := json.Unmarshal(resp.Body, &buckets); err != nil {
 		return nil, err
 	}
-	return &buckets, nil
+	return buckets, nil
 }
 
 // GetBucket https://api.warren.io/#get-bucket
-func (c *Client) GetBucket(ctx context.Context, bucketName string) (*S3Bucket, error) {
+func (c *Client) GetBucket(ctx context.Context, bucketName string) (S3Bucket, error) {
+	var bucket S3Bucket
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   "/v1/storage/bucket",
@@ -137,22 +138,23 @@ func (c *Client) GetBucket(ctx context.Context, bucketName string) (*S3Bucket, e
 	}
 	resp := c.API.FormRequest(ctx, rc)
 	if resp.Error != nil {
-		return nil, resp.Error
+		return bucket, resp.Error
 	}
-	var bucket S3Bucket
+
 	if err := json.Unmarshal(resp.Body, &bucket); err != nil {
-		return nil, err
+		return bucket, err
 	}
-	return &bucket, nil
+	return bucket, nil
 }
 
 // CreateBucket https://api.warren.io/#create-bucket
-func (c *Client) CreateBucket(ctx context.Context, bucketName string) (*S3Bucket, error) {
+func (c *Client) CreateBucket(ctx context.Context, bucketName string) (S3Bucket, error) {
 	d := url.Values{"name": []string{bucketName}}
 	if c.BillingAccountID != 0 {
 		d.Add("billing_account_id", strconv.Itoa(c.BillingAccountID))
 	}
 
+	var bucket S3Bucket
 	rc := api.RequestConfig{
 		Method: "PUT",
 		Path:   "/v1/storage/bucket",
@@ -160,13 +162,12 @@ func (c *Client) CreateBucket(ctx context.Context, bucketName string) (*S3Bucket
 	}
 	resp := c.API.FormRequest(ctx, rc)
 	if resp.Error != nil {
-		return nil, resp.Error
+		return bucket, resp.Error
 	}
-	var bucket S3Bucket
 	if err := json.Unmarshal(resp.Body, &bucket); err != nil {
-		return nil, err
+		return bucket, err
 	}
-	return &bucket, nil
+	return bucket, nil
 }
 
 // DeleteBucket https://api.warren.io/#delete-bucket

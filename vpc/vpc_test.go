@@ -55,7 +55,7 @@ func TestRenameNetwork(t *testing.T) {
 		assert.Equal(t, "PATCH", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/network/%s", loc, id), r.RequestURI)
 
-		var data map[string]interface{}
+		var data map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&data)
 		assert.Equal(t, "Test", data["name"])
 	})

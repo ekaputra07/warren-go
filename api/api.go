@@ -34,20 +34,20 @@ type API struct {
 }
 
 // FormRequest make a call with form-encoded payload
-func (a *API) FormRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
+func (a *API) FormRequest(ctx context.Context, cfg RequestConfig) ClientResponse {
 	req, err := a.buildRequest(ctx, cfg)
 	if err != nil {
-		return &ClientResponse{Error: err}
+		return ClientResponse{Error: err}
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	return a.doRequest(req)
 }
 
 // JsonRequest make a call with json-encoded payload
-func (a *API) JSONRequest(ctx context.Context, cfg RequestConfig) *ClientResponse {
+func (a *API) JSONRequest(ctx context.Context, cfg RequestConfig) ClientResponse {
 	req, err := a.buildRequest(ctx, cfg)
 	if err != nil {
-		return &ClientResponse{Error: err}
+		return ClientResponse{Error: err}
 	}
 	req.Header.Set("Content-Type", "application/json")
 	return a.doRequest(req)
@@ -68,10 +68,10 @@ func (a *API) buildRequest(ctx context.Context, cfg RequestConfig) (*http.Reques
 }
 
 // doRequest doing the actual request
-func (a *API) doRequest(req *http.Request) *ClientResponse {
+func (a *API) doRequest(req *http.Request) ClientResponse {
 	res, err := a.HTTPClient.Do(req)
 	if err != nil {
-		return &ClientResponse{Error: err}
+		return ClientResponse{Error: err}
 	}
 	defer res.Body.Close()
 
@@ -79,17 +79,17 @@ func (a *API) doRequest(req *http.Request) *ClientResponse {
 	if res.StatusCode >= 400 {
 		b, err := io.ReadAll(res.Body)
 		if err != nil {
-			return &ClientResponse{
+			return ClientResponse{
 				Error: fmt.Errorf("api call failed with status code=%d", res.StatusCode),
 			}
 		}
-		return &ClientResponse{
+		return ClientResponse{
 			Body:  b,
 			Error: fmt.Errorf("api call failed with status code=%d: %s", res.StatusCode, b),
 		}
 	}
 	b, err := io.ReadAll(res.Body)
-	return &ClientResponse{Body: b, Error: err}
+	return ClientResponse{Body: b, Error: err}
 }
 
 // New create an instance of API

@@ -34,7 +34,7 @@ func TestCreateFloatingIP(t *testing.T) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/ip_addresses", loc), r.RequestURI)
 
-		var data map[string]interface{}
+		var data map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&data)
 		assert.Equal(t, "Test", data["name"])
 		assert.Equal(t, float64(123), data["billing_account_id"])
@@ -69,7 +69,7 @@ func TestUpdateFloatingIP(t *testing.T) {
 		assert.Equal(t, "PATCH", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/ip_addresses/%s", loc, address), r.RequestURI)
 
-		var data map[string]interface{}
+		var data map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&data)
 		assert.Equal(t, "Test", data["name"])
 		assert.Equal(t, float64(123), data["billing_account_id"])
@@ -80,12 +80,12 @@ func TestUpdateFloatingIP(t *testing.T) {
 	info := IPAddressInfo{Name: "Test", Address: address}
 
 	// BillingAccountID not set
-	err := ip.UpdateFloatingIP(context.Background(), &info)
+	err := ip.UpdateFloatingIP(context.Background(), info)
 	assert.Error(t, err)
 
 	// Success
 	info.BillingAccountID = 123
-	ip.UpdateFloatingIP(context.Background(), &info)
+	ip.UpdateFloatingIP(context.Background(), info)
 }
 
 func TestDeleteFloatingIP(t *testing.T) {
@@ -104,7 +104,7 @@ func TestAssignFloatingIPToVM(t *testing.T) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/ip_addresses/%s/assign", loc, address), r.RequestURI)
 
-		var data map[string]interface{}
+		var data map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&data)
 		assert.Equal(t, vmUUID.String(), data["vm_uuid"])
 	})
@@ -119,7 +119,7 @@ func TestUnassignFloatingIPFromVM(t *testing.T) {
 		assert.Equal(t, "POST", r.Method)
 		assert.Equal(t, fmt.Sprintf("/v1/%s/network/ip_addresses/%s/unassign", loc, address), r.RequestURI)
 
-		var data map[string]interface{}
+		var data map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&data)
 		assert.Equal(t, vmUUID.String(), data["vm_uuid"])
 	})

@@ -17,7 +17,7 @@ func NewClient(client *api.API, location string) *Client {
 }
 
 // ListFloatingIPs https://api.warren.io/#list-floating-ips
-func (c *Client) ListFloatingIPs(ctx context.Context) (*[]IPAddressInfo, error) {
+func (c *Client) ListFloatingIPs(ctx context.Context) ([]IPAddressInfo, error) {
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses", c.Location),
@@ -30,7 +30,7 @@ func (c *Client) ListFloatingIPs(ctx context.Context) (*[]IPAddressInfo, error) 
 	if err := json.Unmarshal(res.Body, &ips); err != nil {
 		return nil, err
 	}
-	return &ips, nil
+	return ips, nil
 }
 
 // CreateFloatingIP https://api.warren.io/#create-floating-ip
@@ -42,7 +42,7 @@ func (c *Client) CreateFloatingIP(ctx context.Context, info *IPAddressInfo) erro
 	rc := api.RequestConfig{
 		Method: "POST",
 		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses", c.Location),
-		JSON: map[string]interface{}{
+		JSON: map[string]any{
 			"name":               info.Name,
 			"billing_account_id": info.BillingAccountID,
 		},
@@ -51,31 +51,28 @@ func (c *Client) CreateFloatingIP(ctx context.Context, info *IPAddressInfo) erro
 	if res.Error != nil {
 		return res.Error
 	}
-	if err := json.Unmarshal(res.Body, info); err != nil {
-		return err
-	}
-	return nil
+	return json.Unmarshal(res.Body, info)
 }
 
 // GetFloatingIP https://api.warren.io/#get-floating-ip
-func (c *Client) GetFloatingIP(ctx context.Context, address string) (*IPAddressInfo, error) {
+func (c *Client) GetFloatingIP(ctx context.Context, address string) (IPAddressInfo, error) {
+	var ip IPAddressInfo
 	rc := api.RequestConfig{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses/%s", c.Location, address),
 	}
 	res := c.API.JSONRequest(ctx, rc)
 	if res.Error != nil {
-		return nil, res.Error
+		return ip, res.Error
 	}
-	var ip IPAddressInfo
 	if err := json.Unmarshal(res.Body, &ip); err != nil {
-		return nil, err
+		return ip, err
 	}
-	return &ip, nil
+	return ip, nil
 }
 
 // UpdateFloatingIP https://api.warren.io/#update-floating-ip
-func (c *Client) UpdateFloatingIP(ctx context.Context, info *IPAddressInfo) error {
+func (c *Client) UpdateFloatingIP(ctx context.Context, info IPAddressInfo) error {
 	if info.BillingAccountID == 0 {
 		return fmt.Errorf("BillingAccountID with value of %v is invalid", info.BillingAccountID)
 	}
@@ -83,16 +80,12 @@ func (c *Client) UpdateFloatingIP(ctx context.Context, info *IPAddressInfo) erro
 	rc := api.RequestConfig{
 		Method: "PATCH",
 		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses/%s", c.Location, info.Address),
-		JSON: map[string]interface{}{
+		JSON: map[string]any{
 			"name":               info.Name,
 			"billing_account_id": info.BillingAccountID,
 		},
 	}
-	res := c.API.JSONRequest(ctx, rc)
-	if res.Error != nil {
-		return res.Error
-	}
-	return nil
+	return c.API.JSONRequest(ctx, rc).Error
 }
 
 // DeleteFloatingIP https://api.warren.io/#delete-floating-ip
@@ -101,11 +94,7 @@ func (c *Client) DeleteFloatingIP(ctx context.Context, address string) error {
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses/%s", c.Location, address),
 	}
-	res := c.API.JSONRequest(ctx, rc)
-	if res.Error != nil {
-		return res.Error
-	}
-	return nil
+	return c.API.JSONRequest(ctx, rc).Error
 }
 
 // AssignFloatingIPToVM https://api.warren.io/#assign-floating-ip
@@ -113,13 +102,9 @@ func (c *Client) AssignFloatingIPToVM(ctx context.Context, address string, vmUUI
 	rc := api.RequestConfig{
 		Method: "POST",
 		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses/%s/assign", c.Location, address),
-		JSON:   map[string]interface{}{"vm_uuid": vmUUID},
+		JSON:   map[string]any{"vm_uuid": vmUUID},
 	}
-	res := c.API.JSONRequest(ctx, rc)
-	if res.Error != nil {
-		return res.Error
-	}
-	return nil
+	return c.API.JSONRequest(ctx, rc).Error
 }
 
 // UnassignFloatingIPFromVM https://api.warren.io/#un-assign-floating-ip
@@ -127,11 +112,7 @@ func (c *Client) UnassignFloatingIPFromVM(ctx context.Context, address string, v
 	rc := api.RequestConfig{
 		Method: "POST",
 		Path:   fmt.Sprintf("/v1/%s/network/ip_addresses/%s/unassign", c.Location, address),
-		JSON:   map[string]interface{}{"vm_uuid": vmUUID},
+		JSON:   map[string]any{"vm_uuid": vmUUID},
 	}
-	res := c.API.JSONRequest(ctx, rc)
-	if res.Error != nil {
-		return res.Error
-	}
-	return nil
+	return c.API.JSONRequest(ctx, rc).Error
 }

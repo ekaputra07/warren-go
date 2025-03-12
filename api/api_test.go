@@ -120,7 +120,7 @@ func TestJSONRequest(t *testing.T) {
 		assert.Equal(t, "secret", r.Header.Get("apikey"))
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 
-		var data map[string]interface{}
+		var data map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&data)
 
 		assert.Equal(t, "test", data["name"])
@@ -130,7 +130,7 @@ func TestJSONRequest(t *testing.T) {
 	})
 	defer s.Close()
 
-	json := map[string]interface{}{
+	json := map[string]any{
 		"name": "test",
 		"age":  20,
 	}

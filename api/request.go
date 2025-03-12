@@ -14,7 +14,7 @@ type RequestConfig struct {
 	Path   string
 	Query  url.Values
 	Data   url.Values
-	JSON   map[string]interface{}
+	JSON   map[string]any
 }
 
 // URL returns full request URL composed from baseURL, Path and Query field.

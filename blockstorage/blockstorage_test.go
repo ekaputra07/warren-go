@@ -20,7 +20,7 @@ func TestListDisks(t *testing.T) {
 	defer s.Close()
 
 	bs := Client{API: a}
-	bs.LisDisks(context.Background())
+	bs.ListDisks(context.Background())
 }
 
 func TestCreateDisk(t *testing.T) {
