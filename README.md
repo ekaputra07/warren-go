@@ -1,5 +1,7 @@
 # Warren Go!
 
+> ✋ DISCONTINUED: Please use their official go-client: https://gitlab.com/warrenio/library/go-client
+
 Golang client library for [Warren.io](https://warren.io/) API. If your cloud hosting provider is using Warren.io (and they enabled the API) then you should be able to manage your infrastructure programatically using this library.
 
 Progress:
